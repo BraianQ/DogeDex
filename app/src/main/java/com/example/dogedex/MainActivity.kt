@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.dogedex.doglist.presentation.DogListScreen
+import com.example.dogedex.navigation.AppNavHost
 import com.example.dogedex.ui.theme.DogeDexTheme
 
 class MainActivity : ComponentActivity() {
@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DogeDexTheme {
-                DogListScreen()
+                AppNavHost()
             }
         }
     }

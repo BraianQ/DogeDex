@@ -1,5 +1,6 @@
 package com.example.dogedex.doglist.presentation
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -37,7 +38,8 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DogListScreen(
-    viewModel: DogListViewModel = koinViewModel()
+    viewModel: DogListViewModel = koinViewModel(),
+    onDogClick: (Dog) -> Unit
 ) {
     val dogList by viewModel.dogList.collectAsState()
 
@@ -65,7 +67,10 @@ fun DogListScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(items = dogList, key = { it.id }) { dog ->
-                DogItem(dog = dog)
+                DogItem(
+                    dog = dog,
+                    onClick = { onDogClick(dog) }
+                )
             }
         }
     }
@@ -74,10 +79,13 @@ fun DogListScreen(
 @Composable
 fun DogItem(
     dog: Dog,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
