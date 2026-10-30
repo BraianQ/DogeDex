@@ -19,4 +19,6 @@ android {
 dependencies {
     implementation(project(":domain"))
     implementation(libs.koin.core)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
 }
