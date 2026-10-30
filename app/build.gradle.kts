@@ -35,7 +35,10 @@ android {
 
 dependencies {
     implementation(project(":domain"))
-    implementation(project(":data"))
+    implementation(project(":di"))
+
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

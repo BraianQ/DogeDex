@@ -18,4 +18,5 @@ android {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(libs.koin.core)
 }

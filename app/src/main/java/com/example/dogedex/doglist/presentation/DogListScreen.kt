@@ -25,14 +25,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.dogedex.R
 import com.example.dogedex.doglist.domain.Dog
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DogListScreen(
-    viewModel: DogListViewModel = viewModel()
+    viewModel: DogListViewModel = koinViewModel()
 ) {
     val dogList by viewModel.dogList.collectAsState()
 
