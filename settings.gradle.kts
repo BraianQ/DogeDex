@@ -24,4 +24,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "DogeDex"
 include(":app")
- 
+include(":domain")
+include(":data")
