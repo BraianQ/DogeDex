@@ -1,5 +1,5 @@
 package com.example.dogedex.doglist.domain
 
 interface DogRepository {
-    suspend fun getDogs(): List<Dog>
+    suspend fun getDogs(): ApiResponse<List<Dog>>
 }
