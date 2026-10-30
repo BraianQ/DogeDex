@@ -1,5 +1,7 @@
 package com.example.dogedex.doglist.domain
 
+import java.io.Serializable
+
 data class Dog(
     val id: Long,
     val index: Int,
@@ -12,4 +14,4 @@ data class Dog(
     val temperament: String,
     val weightFemale: Double,
     val weightMale: Double
-)
+) : Serializable
