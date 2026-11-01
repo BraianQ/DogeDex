@@ -10,13 +10,16 @@ import com.example.dogedex.doglist.data.api.makeNetworkCall
 import com.example.dogedex.doglist.domain.ApiResponse
 
 class AuthRepositoryImpl(
-    private val authApiService: AuthApiService
+    private val authApiService: AuthApiService,
+    private val userLocalDataSource: UserLocalDataSource
 ) : AuthRepository {
 
     override suspend fun login(email: String, password: String): ApiResponse<User> = makeNetworkCall {
         val response = authApiService.login(LoginRequest(email, password))
         if (response.isSuccess) {
-            response.data.user.toDomain()
+            val user = response.data.user.toDomain()
+            userLocalDataSource.saveUser(user)
+            user
         } else {
             throw Exception(response.message)
         }
@@ -29,9 +32,19 @@ class AuthRepositoryImpl(
     ): ApiResponse<User> = makeNetworkCall {
         val response = authApiService.signUp(SignUpRequest(email, password, passwordConfirmation))
         if (response.isSuccess) {
-            response.data.user.toDomain()
+            val user = response.data.user.toDomain()
+            userLocalDataSource.saveUser(user)
+            user
         } else {
             throw Exception(response.message)
         }
+    }
+
+    override suspend fun getLoggedInUser(): User? {
+        return userLocalDataSource.getUser()
+    }
+
+    override suspend fun logout() {
+        userLocalDataSource.clearUser()
     }
 }
