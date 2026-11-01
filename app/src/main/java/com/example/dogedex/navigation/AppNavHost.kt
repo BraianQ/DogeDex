@@ -5,11 +5,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.dogedex.auth.presentation.LoginScreen
+import com.example.dogedex.auth.presentation.SignUpScreen
 import com.example.dogedex.dogdetail.presentation.DogDetailScreen
 import com.example.dogedex.doglist.domain.Dog
 import com.example.dogedex.doglist.presentation.DogListScreen
 
 sealed class NavDestination(val route: String) {
+    object Login : NavDestination("login")
+    object SignUp : NavDestination("sign_up")
     object DogList : NavDestination("dog_list")
     object DogDetail : NavDestination("dog_detail")
 }
@@ -20,8 +24,38 @@ fun AppNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = NavDestination.DogList.route
+        startDestination = NavDestination.Login.route
     ) {
+        composable(NavDestination.Login.route) {
+            LoginScreen(
+                onLoginSuccess = {
+                    navController.navigate(NavDestination.DogList.route) {
+                        popUpTo(NavDestination.Login.route) {
+                            inclusive = true
+                        }
+                    }
+                },
+                onNavigateToSignUp = {
+                    navController.navigate(NavDestination.SignUp.route)
+                }
+            )
+        }
+
+        composable(NavDestination.SignUp.route) {
+            SignUpScreen(
+                onSignUpSuccess = {
+                    navController.navigate(NavDestination.DogList.route) {
+                        popUpTo(NavDestination.Login.route) {
+                            inclusive = true
+                        }
+                    }
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
         composable(NavDestination.DogList.route) {
             DogListScreen(
                 onDogClick = { dog ->
@@ -30,6 +64,7 @@ fun AppNavHost(
                 }
             )
         }
+
         composable(NavDestination.DogDetail.route) {
             val dog = navController.previousBackStackEntry?.savedStateHandle?.get<Dog>("selected_dog")
             if (dog != null) {

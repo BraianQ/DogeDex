@@ -1,9 +1,9 @@
 package com.example.dogedex.auth.data
 
 import com.example.dogedex.auth.data.api.AuthApiService
-import com.example.dogedex.auth.data.dto.LoginRequestDTO
-import com.example.dogedex.auth.data.dto.SignUpRequestDTO
-import com.example.dogedex.auth.data.dto.toDomain
+import com.example.dogedex.auth.data.request.LoginRequest
+import com.example.dogedex.auth.data.request.SignUpRequest
+import com.example.dogedex.auth.data.response.toDomain
 import com.example.dogedex.auth.domain.AuthRepository
 import com.example.dogedex.auth.domain.User
 import com.example.dogedex.doglist.data.api.makeNetworkCall
@@ -14,7 +14,7 @@ class AuthRepositoryImpl(
 ) : AuthRepository {
 
     override suspend fun login(email: String, password: String): ApiResponse<User> = makeNetworkCall {
-        val response = authApiService.login(LoginRequestDTO(email, password))
+        val response = authApiService.login(LoginRequest(email, password))
         if (response.isSuccess) {
             response.data.user.toDomain()
         } else {
@@ -27,7 +27,7 @@ class AuthRepositoryImpl(
         password: String,
         passwordConfirmation: String
     ): ApiResponse<User> = makeNetworkCall {
-        val response = authApiService.signUp(SignUpRequestDTO(email, password, passwordConfirmation))
+        val response = authApiService.signUp(SignUpRequest(email, password, passwordConfirmation))
         if (response.isSuccess) {
             response.data.user.toDomain()
         } else {
