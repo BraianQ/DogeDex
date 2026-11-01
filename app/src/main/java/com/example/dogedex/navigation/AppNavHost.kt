@@ -20,11 +20,12 @@ sealed class NavDestination(val route: String) {
 
 @Composable
 fun AppNavHost(
+    startDestination: String,
     navController: NavHostController = rememberNavController()
 ) {
     NavHost(
         navController = navController,
-        startDestination = NavDestination.Login.route
+        startDestination = startDestination
     ) {
         composable(NavDestination.Login.route) {
             LoginScreen(
@@ -61,6 +62,13 @@ fun AppNavHost(
                 onDogClick = { dog ->
                     navController.currentBackStackEntry?.savedStateHandle?.set("selected_dog", dog)
                     navController.navigate(NavDestination.DogDetail.route)
+                },
+                onLogout = {
+                    navController.navigate(NavDestination.Login.route) {
+                        popUpTo(NavDestination.DogList.route) {
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }
