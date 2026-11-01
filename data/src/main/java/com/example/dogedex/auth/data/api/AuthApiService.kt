@@ -1,15 +1,15 @@
 package com.example.dogedex.auth.data.api
 
-import com.example.dogedex.auth.data.dto.LoginRequestDTO
-import com.example.dogedex.auth.data.dto.SignUpRequestDTO
-import com.example.dogedex.auth.data.dto.UserApiResponse
+import com.example.dogedex.auth.data.request.LoginRequest
+import com.example.dogedex.auth.data.request.SignUpRequest
+import com.example.dogedex.auth.data.response.UserApiResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface AuthApiService {
     @POST("sign_in")
-    suspend fun login(@Body loginRequestDTO: LoginRequestDTO): UserApiResponse
+    suspend fun login(@Body loginRequest: LoginRequest): UserApiResponse
 
     @POST("sign_up")
-    suspend fun signUp(@Body signUpRequestDTO: SignUpRequestDTO): UserApiResponse
+    suspend fun signUp(@Body signUpRequest: SignUpRequest): UserApiResponse
 }
