@@ -1,6 +1,7 @@
 package com.example.dogedex.doglist.presentation
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -105,7 +107,8 @@ fun DogListScreen(
                         items(items = state.dogs, key = { it.id }) { dog ->
                             DogGridItem(
                                 dog = dog,
-                                onClick = { onDogClick(dog) }
+                                onClick = { onDogClick(dog) },
+                                onLongClick = { viewModel.addDogToUser(dog.id) }
                             )
                         }
                     }
@@ -136,27 +139,63 @@ fun DogListScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DogGridItem(
     dog: Dog,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .aspectRatio(1f)
-            .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        AsyncImage(
-            model = dog.imageUrl,
-            contentDescription = dog.name,
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(12.dp)),
-            contentScale = ContentScale.Crop
-        )
+    val isCollected = dog.name.isNotEmpty()
+
+    if (isCollected) {
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .combinedClickable(
+                    onClick = { onClick() },
+                    onLongClick = { onLongClick() }
+                ),
+            shape = RoundedCornerShape(12.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        ) {
+            AsyncImage(
+                model = dog.imageUrl,
+                contentDescription = dog.name,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
+            )
+        }
+    } else {
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .combinedClickable(
+                    onClick = { },
+                    onLongClick = { onLongClick() }
+                ),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.error
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = dog.index.toString(),
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onError
+                )
+            }
+        }
     }
 }

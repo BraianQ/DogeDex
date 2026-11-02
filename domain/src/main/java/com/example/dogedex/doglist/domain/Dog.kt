@@ -14,4 +14,6 @@ data class Dog(
     val temperament: String,
     val weightFemale: Double,
     val weightMale: Double
-) : Serializable
+) : Serializable, Comparable<Dog> {
+    override fun compareTo(other: Dog): Int = index.compareTo(other.index)
+}

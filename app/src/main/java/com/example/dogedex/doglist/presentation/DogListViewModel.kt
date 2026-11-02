@@ -3,15 +3,17 @@ package com.example.dogedex.doglist.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dogedex.auth.domain.LogoutUseCase
+import com.example.dogedex.doglist.domain.AddDogToUserUseCase
 import com.example.dogedex.doglist.domain.ApiResponse
-import com.example.dogedex.doglist.domain.GetDogListUseCase
+import com.example.dogedex.doglist.domain.GetDogCollectionUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class DogListViewModel(
-    private val getDogListUseCase: GetDogListUseCase,
+    private val getDogCollectionUseCase: GetDogCollectionUseCase,
+    private val addDogToUserUseCase: AddDogToUserUseCase,
     private val logoutUseCase: LogoutUseCase
 ) : ViewModel() {
 
@@ -25,9 +27,23 @@ class DogListViewModel(
     fun getDogList() {
         viewModelScope.launch {
             _uiState.value = DogListUiState.Loading
-            when (val response = getDogListUseCase()) {
+            when (val response = getDogCollectionUseCase()) {
                 is ApiResponse.Success -> {
                     _uiState.value = DogListUiState.Success(response.data)
+                }
+                is ApiResponse.Error -> {
+                    _uiState.value = DogListUiState.Error(response.message)
+                }
+            }
+        }
+    }
+
+    fun addDogToUser(dogId: Long) {
+        viewModelScope.launch {
+            _uiState.value = DogListUiState.Loading
+            when (val response = addDogToUserUseCase(dogId)) {
+                is ApiResponse.Success -> {
+                    getDogList()
                 }
                 is ApiResponse.Error -> {
                     _uiState.value = DogListUiState.Error(response.message)
