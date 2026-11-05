@@ -1,5 +1,6 @@
 package com.example.dogedex
 
+import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.dogedex.navigation.AppNavHost
+import com.example.dogedex.ui.permission.RequestPermissions
 import com.example.dogedex.ui.theme.DogeDexTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -24,6 +26,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DogeDexTheme {
+                RequestPermissions(
+                    permissions = listOf(
+                        Manifest.permission.CAMERA
+                    )
+                )
+
                 val uiState by mainViewModel.uiState.collectAsState()
 
                 when (val state = uiState) {

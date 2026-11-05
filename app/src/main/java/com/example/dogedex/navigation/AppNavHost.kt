@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.dogedex.auth.presentation.LoginScreen
 import com.example.dogedex.auth.presentation.SignUpScreen
+import com.example.dogedex.camera.presentation.CameraScreen
 import com.example.dogedex.dogdetail.presentation.DogDetailScreen
 import com.example.dogedex.doglist.domain.Dog
 import com.example.dogedex.doglist.presentation.DogListScreen
@@ -16,6 +17,7 @@ sealed class NavDestination(val route: String) {
     object SignUp : NavDestination("sign_up")
     object DogList : NavDestination("dog_list")
     object DogDetail : NavDestination("dog_detail")
+    object Camera : NavDestination("camera")
 }
 
 @Composable
@@ -69,6 +71,9 @@ fun AppNavHost(
                             inclusive = true
                         }
                     }
+                },
+                onCameraClick = {
+                    navController.navigate(NavDestination.Camera.route)
                 }
             )
         }
@@ -81,6 +86,16 @@ fun AppNavHost(
                     onBackClick = { navController.popBackStack() }
                 )
             }
+        }
+
+        composable(NavDestination.Camera.route) {
+            CameraScreen(
+                onBackClick = { navController.popBackStack() },
+                onPhotoCaptured = { uri ->
+                    navController.previousBackStackEntry?.savedStateHandle?.set("captured_photo_uri", uri)
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }
