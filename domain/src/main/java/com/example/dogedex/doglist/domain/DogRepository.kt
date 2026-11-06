@@ -5,4 +5,5 @@ interface DogRepository {
     suspend fun addDogToUser(dogId: Long): ApiResponse<Unit>
     suspend fun getUserDogs(): ApiResponse<List<Dog>>
     suspend fun getDogCollection(): ApiResponse<List<Dog>>
+    suspend fun getDogByMlId(mlId: String): ApiResponse<Dog>
 }

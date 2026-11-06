@@ -36,6 +36,7 @@ android {
 dependencies {
     implementation(project(":domain"))
     implementation(project(":di"))
+    implementation(project(":machinelearning"))
 
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)

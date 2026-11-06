@@ -1,5 +1,6 @@
 package com.example.dogedex.doglist.presentation
 
+import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -53,11 +55,23 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun DogListScreen(
     viewModel: DogListViewModel = koinViewModel(),
+    photoUri: Uri? = null,
+    recognitionId: String? = null,
     onDogClick: (Dog) -> Unit,
     onLogout: () -> Unit,
-    onCameraClick: () -> Unit = {}
+    onCameraClick: () -> Unit = {},
+    onResetRecognition: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(recognitionId) {
+        if (!recognitionId.isNullOrEmpty()) {
+            viewModel.getDogByMlId(recognitionId) { dog ->
+                onDogClick(dog)
+                onResetRecognition()
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
