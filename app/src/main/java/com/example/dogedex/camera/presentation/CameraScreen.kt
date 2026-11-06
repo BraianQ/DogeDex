@@ -1,6 +1,7 @@
 package com.example.dogedex.camera.presentation
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -47,6 +48,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil.compose.AsyncImage
+import com.example.dogedex.machinelearning.Classifier
+import com.example.dogedex.machinelearning.ClassifierOutput
+import org.koin.compose.koinInject
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -54,8 +58,9 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CameraScreen(
+    classifier: Classifier = koinInject(),
     onBackClick: () -> Unit,
-    onPhotoCaptured: (Uri) -> Unit = {}
+    onPhotoCaptured: (Uri, List<ClassifierOutput>) -> Unit = { _, _ -> }
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -133,7 +138,23 @@ fun CameraScreen(
                         }
 
                         IconButton(
-                            onClick = { onPhotoCaptured(currentUri) },
+                            onClick = {
+                                val bitmap = try {
+                                    context.contentResolver.openInputStream(currentUri)?.use { inputStream ->
+                                        BitmapFactory.decodeStream(inputStream)
+                                    }
+                                } catch (e: Exception) {
+                                    null
+                                }
+
+                                val recognitions = if (bitmap != null) {
+                                    classifier.recognizeImage(bitmap)
+                                } else {
+                                    emptyList()
+                                }
+
+                                onPhotoCaptured(currentUri, recognitions)
+                            },
                             modifier = Modifier
                                 .size(56.dp)
                                 .clip(CircleShape)

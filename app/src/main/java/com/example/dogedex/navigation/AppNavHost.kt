@@ -1,6 +1,11 @@
 package com.example.dogedex.navigation
 
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -59,21 +64,30 @@ fun AppNavHost(
             )
         }
 
-        composable(NavDestination.DogList.route) {
+        composable(NavDestination.DogList.route) { backStackEntry ->
+            val photoUri by backStackEntry.savedStateHandle.getStateFlow<Uri?>("captured_photo_uri", null).collectAsState()
+            val recognitionId by backStackEntry.savedStateHandle.getStateFlow<String?>("recognition_id", null).collectAsState()
+
             DogListScreen(
+                photoUri = photoUri,
+                recognitionId = recognitionId,
                 onDogClick = { dog ->
                     navController.currentBackStackEntry?.savedStateHandle?.set("selected_dog", dog)
                     navController.navigate(NavDestination.DogDetail.route)
                 },
                 onLogout = {
                     navController.navigate(NavDestination.Login.route) {
-                        popUpTo(NavDestination.DogList.route) {
+                        popUpTo(NavDestination.Login.route) {
                             inclusive = true
                         }
                     }
                 },
                 onCameraClick = {
                     navController.navigate(NavDestination.Camera.route)
+                },
+                onResetRecognition = {
+                    backStackEntry.savedStateHandle["captured_photo_uri"] = null
+                    backStackEntry.savedStateHandle["recognition_id"] = null
                 }
             )
         }
@@ -89,10 +103,20 @@ fun AppNavHost(
         }
 
         composable(NavDestination.Camera.route) {
+            val context = LocalContext.current
             CameraScreen(
                 onBackClick = { navController.popBackStack() },
-                onPhotoCaptured = { uri ->
+                onPhotoCaptured = { uri, recognitions ->
+                    val topRecognition = recognitions.firstOrNull()
+                    val message = if (topRecognition != null) {
+                        "Perro reconocido: ID ${topRecognition.id} (${(topRecognition.confidence * 100).toInt()}%)"
+                    } else {
+                        "No se pudo reconocer el perro"
+                    }
+                    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+
                     navController.previousBackStackEntry?.savedStateHandle?.set("captured_photo_uri", uri)
+                    navController.previousBackStackEntry?.savedStateHandle?.set("recognition_id", topRecognition?.id)
                     navController.popBackStack()
                 }
             )

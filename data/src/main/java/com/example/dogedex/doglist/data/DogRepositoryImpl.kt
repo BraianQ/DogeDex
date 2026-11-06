@@ -2,6 +2,7 @@ package com.example.dogedex.doglist.data
 
 import com.example.dogedex.doglist.data.api.DogApiService
 import com.example.dogedex.doglist.data.api.dto.AddDogToUserRequest
+import com.example.dogedex.doglist.data.api.dto.toDomain
 import com.example.dogedex.doglist.data.api.dto.toDomainList
 import com.example.dogedex.doglist.data.api.makeNetworkCall
 import com.example.dogedex.doglist.domain.ApiResponse
@@ -79,6 +80,15 @@ class DogRepositoryImpl(
             allDogsResponse is ApiResponse.Error -> ApiResponse.Error(allDogsResponse.message)
             userDogsResponse is ApiResponse.Error -> ApiResponse.Error(userDogsResponse.message)
             else -> ApiResponse.Error("Error desconocido al obtener la colección de perros")
+        }
+    }
+
+    override suspend fun getDogByMlId(mlId: String): ApiResponse<Dog> = makeNetworkCall {
+        val response = apiService.getDogByMlId(mlId)
+        if (response.isSuccess) {
+            response.data.dog.toDomain()
+        } else {
+            throw Exception(response.message)
         }
     }
 }
